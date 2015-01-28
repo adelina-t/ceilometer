@@ -152,6 +152,28 @@ class TestUtilsV2(base.BaseTestCase):
         self.assertEqual(fake_instance_id, disk_metrics[0]['instance_id'])
         self.assertEqual(fake_host_resource, disk_metrics[0]['host_resource'])
 
+    def test_get_disk_iops_metrics(self):
+        fake_vm_name = mock.sentinel.VM_NAME
+        fake_host_resource = mock.sentinel.FAKE_HOST_RESOURCE
+        fake_instance_id = mock.sentinel.FAKE_INSTANCE_ID
+        fake_iops_count = mock.sentinel.FAKE_IOPS_COUNT
+
+        self._utils._lookup_vm = mock.MagicMock()
+
+        mock_disk = mock.MagicMock()
+        mock_disk.HostResource = [fake_host_resource]
+        mock_disk.InstanceID = fake_instance_id
+        self._utils._get_vm_resources = mock.MagicMock(
+            return_value=[mock_disk])
+
+        self._utils._get_metric_values = mock.MagicMock(
+            return_value=[fake_iops_count])
+
+        disk_metrics = list(self._utils.get_disk_iops_count(fake_vm_name))
+
+        self.assertEqual(1, len(disk_metrics))
+        self.assertEqual(fake_iops_count, disk_metrics[0]['iops_count'])
+
     def test_get_metric_value_instances(self):
         mock_el1 = mock.MagicMock()
         mock_associator = mock.MagicMock()

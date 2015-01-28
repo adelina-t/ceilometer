@@ -131,6 +131,8 @@ DiskRateStats = collections.namedtuple('DiskRateStats',
                                         'write_bytes_rate',
                                         'write_requests_rate'])
 
+DiskIOPSStats = collections.namedtuple('DiskIOPSStats',
+                                       ['iops_count'])
 
 # Exception types
 #
@@ -221,6 +223,9 @@ class Inspector(object):
         :return: for each disk, the number of bytes & operations
                  read and written per second, with the error count
         """
+        raise ceilometer.NotImplementedError
+
+    def inspect_disk_iops(self, instance):
         raise ceilometer.NotImplementedError
 
 

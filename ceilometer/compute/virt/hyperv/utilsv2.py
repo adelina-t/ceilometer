@@ -58,6 +58,7 @@ class UtilsV2(object):
     # Disk metrics are supported from Hyper-V 2012 R2
     _DISK_RD_METRIC_NAME = 'Disk Data Read'
     _DISK_WR_METRIC_NAME = 'Disk Data Written'
+    _DISK_IOPS_METRIC_NAME = 'Average Normalized Disk Throughput'
 
     def __init__(self, host='.'):
         if sys.platform == 'win32':
@@ -139,6 +140,24 @@ class UtilsV2(object):
                 # Values are in megabytes
                 'read_mb': metric_values[0],
                 'write_mb': metric_values[1],
+                'instance_id': disk.InstanceID,
+                'host_resource': host_resource
+            }
+
+    def get_disk_iops_count(self, vm_name):
+        vm = self._lookup_vm(vm_name)
+        metric_def_iops = self._get_metric_def(self._DISK_IOPS_METRIC_NAME)
+
+        disks = self._get_vm_resources(vm, self._STORAGE_ALLOC)
+        for disk in disks:
+            metric_values = self._get_metric_values(
+                disk,[metric_def_iops])
+
+            if disk.HostResource:
+                host_resource = disk.HostResource[0]
+
+            yield {
+                'iops_count': metric_values[0],
                 'instance_id': disk.InstanceID,
                 'host_resource': host_resource
             }
